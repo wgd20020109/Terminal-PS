@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal · 个人空间</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <link rel="stylesheet" href="css/tools.css">
+  <link rel="stylesheet" href="css/llm.css">
+  <link rel="stylesheet" href="css/anime.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 动态背景粒子 -->
+  <canvas id="particles-bg"></canvas>
+
+  <!-- 二次元装饰层 -->
+  <div id="anime-decorations" class="anime-layer">
+    <div class="floating-sakura" id="sakura-container"></div>
+  </div>
+
+  <!-- 主布局 -->
+  <div class="app-layout">
+    <!-- 侧边栏 -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="avatar-ring">
+          <div class="avatar" id="user-avatar">
+            <span class="avatar-text">⌂</span>
+          </div>
+        </div>
+        <span class="sidebar-title">Terminal</span>
+        <button class="sidebar-toggle" id="sidebar-toggle" title="折叠侧边栏">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-nav">
+        <a class="nav-item active" data-page="home" title="主页">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label">主页</span>
+        </a>
+        <a class="nav-item" data-page="tools" title="工具库">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <span class="nav-label">工具库</span>
+        </a>
+        <a class="nav-item" data-page="llm" title="大模型">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/>
+            <path d="M6 10h12l1 10H5L6 10z"/>
+            <circle cx="9" cy="15" r="1" fill="currentColor"/>
+            <circle cx="15" cy="15" r="1" fill="currentColor"/>
+          </svg>
+          <span class="nav-label">大模型</span>
+        </a>
+        <a class="nav-item" data-page="files" title="文件库">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span class="nav-label">文件库</span>
+        </a>
+        <a class="nav-item" data-page="settings" title="设置">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <span class="nav-label">设置</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <span class="status-dot online"></span>
+          <span class="nav-label status-text">在线</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="main-content" id="main-content">
+      <!-- ===== 主页 ===== -->
+      <section class="page active" id="page-home">
+        <div class="page-header">
+          <h1 class="page-title">
+            <span class="greeting" id="greeting-text">你好</span>
+            <span class="subtitle" id="date-display"></span>
+          </h1>
+        </div>
+
+        <div class="home-grid">
+          <!-- 时钟卡片 -->
+          <div class="card card-clock" id="clock-card">
+            <div class="clock-display">
+              <div class="clock-time" id="clock-time">00:00:00</div>
+              <div class="clock-date" id="clock-date"></div>
+              <div class="clock-info" id="clock-info"></div>
+            </div>
+          </div>
+
+          <!-- 天气卡片 -->
+          <div class="card card-weather" id="weather-card">
+            <div class="card-header">
+              <span class="card-title">天气</span>
+              <button class="card-action" onclick="WeatherWidget.refresh()" title="刷新">⟳</button>
+            </div>
+            <div class="weather-body" id="weather-body">
+              <div class="weather-loading">获取天气中...</div>
+            </div>
+          </div>
+
+          <!-- 一言卡片 -->
+          <div class="card card-hitokoto" id="hitokoto-card">
+            <div class="card-header">
+              <span class="card-title">一言</span>
+              <button class="card-action" onclick="HitokotoWidget.refresh()" title="换一句">⟳</button>
+            </div>
+            <div class="hitokoto-body">
+              <p class="hitokoto-text" id="hitokoto-text">加载中...</p>
+              <span class="hitokoto-from" id="hitokoto-from"></span>
+            </div>
+          </div>
+
+          <!-- 快捷入口 -->
+          <div class="card card-shortcuts">
+            <div class="card-header">
+              <span class="card-title">快捷入口</span>
+              <button class="card-action" onclick="ShortcutsWidget.edit()" title="编辑">✎</button>
+            </div>
+            <div class="shortcuts-grid" id="shortcuts-grid"></div>
+          </div>
+
+          <!-- 待办事项 -->
+          <div class="card card-todo">
+            <div class="card-header">
+              <span class="card-title">待办事项</span>
+              <span class="todo-count" id="todo-count">0</span>
+            </div>
+            <div class="todo-input-wrap">
+              <input type="text" id="todo-input" class="todo-input" placeholder="添加待办... (Enter确认)">
+              <button class="todo-add-btn" onclick="TodoWidget.add()">+</button>
+            </div>
+            <ul class="todo-list" id="todo-list"></ul>
+          </div>
+
+          <!-- 系统状态 -->
+          <div class="card card-system">
+            <div class="card-header">
+              <span class="card-title">系统状态</span>
+            </div>
+            <div class="system-info" id="system-info">
+              <div class="sys-row"><span class="sys-label">浏览器</span><span class="sys-value" id="sys-browser"></span></div>
+              <div class="sys-row"><span class="sys-label">分辨率</span><span class="sys-value" id="sys-resolution"></span></div>
+              <div class="sys-row"><span class="sys-label">语言</span><span class="sys-value" id="sys-lang"></span></div>
+              <div class="sys-row"><span class="sys-label">在线状态</span><span class="sys-value" id="sys-online"></span></div>
+              <div class="sys-row"><span class="sys-label">本地时间</span><span class="sys-value" id="sys-localtime"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 工具库 ===== -->
+      <section class="page" id="page-tools">
+        <div class="page-header">
+          <h1 class="page-title">工具库</h1>
+          <div class="tools-search-wrap">
+            <input type="text" id="tools-search" class="tools-search" placeholder="搜索工具...">
+          </div>
+        </div>
+        <div class="tools-categories" id="tools-categories"></div>
+        <div class="tools-workspace" id="tools-workspace" style="display:none;">
+          <div class="tool-header">
+            <button class="tool-back" onclick="ToolManager.closeTool()">← 返回</button>
+            <h2 class="tool-title" id="tool-title"></h2>
+          </div>
+          <div class="tool-content" id="tool-content"></div>
+        </div>
+      </section>
+
+      <!-- ===== 大模型 ===== -->
+      <section class="page" id="page-llm">
+        <div class="page-header">
+          <h1 class="page-title">大模型管理</h1>
+          <div class="llm-actions">
+            <button class="btn btn-sm" onclick="LLMManager.showConfig()">⚙ 模型配置</button>
+            <button class="btn btn-sm" onclick="LLMManager.showPrompts()">📝 Prompt模板</button>
+          </div>
+        </div>
+
+        <div class="llm-layout">
+          <!-- 对话列表侧栏 -->
+          <div class="llm-sidebar" id="llm-sidebar">
+            <button class="btn btn-primary btn-new-chat" onclick="LLMManager.newChat()">
+              + 新对话
+            </button>
+            <div class="chat-list" id="chat-list"></div>
+          </div>
+
+          <!-- 对话区域 -->
+          <div class="llm-main">
+            <!-- 模型选择栏 -->
+            <div class="llm-model-bar">
+              <select id="model-select" class="model-select">
+                <option value="">选择模型...</option>
+              </select>
+              <div class="model-info" id="model-info"></div>
+            </div>
+
+            <!-- 消息区域 -->
+            <div class="chat-messages" id="chat-messages">
+              <div class="chat-empty">
+                <div class="chat-empty-icon">🤖</div>
+                <p>选择一个模型，开始对话</p>
+              </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="chat-input-area">
+              <div class="chat-input-wrap">
+                <textarea id="chat-input" class="chat-input" placeholder="输入消息... (Ctrl+Enter 发送)" rows="1"></textarea>
+                <button class="chat-send-btn" id="chat-send-btn" onclick="LLMManager.send()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 模型配置弹窗 -->
+        <div class="modal" id="modal-llm-config">
+          <div class="modal-overlay" onclick="Modal.close('modal-llm-config')"></div>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>模型配置</h3>
+              <button class="modal-close" onclick="Modal.close('modal-llm-config')">×</button>
+            </div>
+            <div class="modal-body" id="llm-config-body"></div>
+          </div>
+        </div>
+
+        <!-- Prompt模板弹窗 -->
+        <div class="modal" id="modal-prompts">
+          <div class="modal-overlay" onclick="Modal.close('modal-prompts')"></div>
+          <div class="modal-content modal-wide">
+            <div class="modal-header">
+              <h3>Prompt 模板库</h3>
+              <button class="modal-close" onclick="Modal.close('modal-prompts')">×</button>
+            </div>
+            <div class="modal-body" id="prompts-body"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 文件库 ===== -->
+      <section class="page" id="page-files">
+        <div class="page-header">
+          <h1 class="page-title">文件库</h1>
+          <div class="files-actions">
+            <button class="btn btn-sm" onclick="FileManager.createFolder()">📁 新建文件夹</button>
+            <button class="btn btn-sm" onclick="FileManager.uploadFile()">📤 上传文件</button>
+          </div>
+        </div>
+        <div class="files-breadcrumb" id="files-breadcrumb"></div>
+        <div class="files-layout">
+          <div class="files-sidebar">
+            <div class="files-tags" id="files-tags">
+              <h4>标签</h4>
+              <div class="tag-list" id="tag-list"></div>
+            </div>
+            <div class="files-quick">
+              <h4>快速访问</h4>
+              <a class="quick-item" onclick="FileManager.goTo('recent')">🕐 最近</a>
+              <a class="quick-item" onclick="FileManager.goTo('starred')">⭐ 收藏</a>
+              <a class="quick-item" onclick="FileManager.goTo('trash')">🗑️ 回收站</a>
+            </div>
+          </div>
+          <div class="files-main">
+            <div class="files-grid" id="files-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 设置 ===== -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title">设置</h1>
+        </div>
+        <div class="settings-grid">
+          <!-- 深色/浅色模式 -->
+          <div class="card settings-card">
+            <h3>🌓 显示模式</h3>
+            <div class="setting-row">
+              <label>深色模式</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-dark-mode" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <label>自动跟随系统</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-auto-theme">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 主题设置 -->
+          <div class="card settings-card">
+            <h3>🎨 主题</h3>
+            <div class="setting-row">
+              <label>主题色</label>
+              <div class="color-presets" id="color-presets">
+                <button class="color-dot active" data-color="cyan" style="background:#00f0ff" title="赛博青"></button>
+                <button class="color-dot" data-color="pink" style="background:#ff6b9d" title="樱粉"></button>
+                <button class="color-dot" data-color="purple" style="background:#b48eff" title="星紫"></button>
+                <button class="color-dot" data-color="green" style="background:#00ff88" title="矩阵绿"></button>
+                <button class="color-dot" data-color="orange" style="background:#ff9f43" title="暖橙"></button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label>自定义主题色</label>
+              <input type="color" id="custom-color" class="color-picker" value="#00f0ff">
+            </div>
+          </div>
+
+          <!-- 二次元设置 -->
+          <div class="card settings-card">
+            <h3>✨ 二次元元素</h3>
+            <div class="setting-row">
+              <label>樱花飘落</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-sakura" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <label>粒子背景</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-particles" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <label>一言（动漫语录）</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-hitokoto" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-row">
+              <label>动态光效</label>
+              <label class="switch">
+                <input type="checkbox" id="setting-glow" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 布局设置 -->
+          <div class="card settings-card">
+            <h3>📐 布局</h3>
+            <div class="setting-row">
+              <label>侧边栏位置</label>
+              <select id="setting-sidebar-pos" class="setting-select">
+                <option value="left">左侧</option>
+                <option value="right">右侧</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label>卡片圆角</label>
+              <input type="range" id="setting-radius" min="0" max="24" value="12" class="setting-range">
+            </div>
+          </div>
+
+          <!-- 数据管理 -->
+          <div class="card settings-card">
+            <h3>💾 数据</h3>
+            <div class="setting-row">
+              <button class="btn btn-sm" onclick="SettingsManager.exportData()">导出所有数据</button>
+              <button class="btn btn-sm" onclick="SettingsManager.importData()">导入数据</button>
+            </div>
+            <div class="setting-row">
+              <button class="btn btn-sm btn-danger" onclick="SettingsManager.clearData()">清除所有数据</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast通知 -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- 脚本加载 -->
+  <script src="js/core.js"></script>
+  <script src="js/widgets/clock.js"></script>
+  <script src="js/widgets/weather.js"></script>
+  <script src="js/widgets/hitokoto.js"></script>
+  <script src="js/widgets/shortcuts.js"></script>
+  <script src="js/widgets/todo.js"></script>
+  <script src="js/tools/registry.js"></script>
+  <script src="js/tools/json-formatter.js"></script>
+  <script src="js/tools/base64.js"></script>
+  <script src="js/tools/color-converter.js"></script>
+  <script src="js/tools/regex-tester.js"></script>
+  <script src="js/tools/markdown-preview.js"></script>
+  <script src="js/tools/hash-generator.js"></script>
+  <script src="js/tools/timestamp.js"></script>
+  <script src="js/tools/uuid-generator.js"></script>
+  <script src="js/tools/qrcode.js"></script>
+  <script src="js/tools/text-diff.js"></script>
+  <script src="js/llm.js"></script>
+  <script src="js/files.js"></script>
+  <script src="js/anime.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

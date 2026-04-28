@@ -201,4 +201,3 @@ MIT License
 ---
 
 > 🌸 「即使如此，世界依然美丽。」
-# Terminal-PS

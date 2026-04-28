@@ -1,0 +1,190 @@
+/* ============================================
+   anime.css — 二次元装饰元素
+   ============================================ */
+
+/* --- 樱花飘落 --- */
+.sakura {
+  position: absolute;
+  pointer-events: none;
+  animation: sakuraFall linear infinite;
+  will-change: transform;
+  z-index: 1;
+}
+
+.sakura::before {
+  content: '🌸';
+  font-size: var(--size, 16px);
+  display: block;
+  opacity: var(--opacity, 0.6);
+  filter: hue-rotate(var(--hue, 0deg));
+}
+
+@keyframes sakuraFall {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: var(--opacity, 0.6); }
+  90% { opacity: var(--opacity, 0.6); }
+  100% {
+    transform: translateY(110vh) translateX(var(--drift, 100px)) rotate(var(--spin, 360deg));
+    opacity: 0;
+  }
+}
+
+/* --- 动态光晕 --- */
+.glow-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.15;
+  z-index: 0;
+  animation: orbFloat 20s ease-in-out infinite alternate;
+}
+
+.glow-orb:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  background: var(--accent);
+  top: -100px;
+  right: -100px;
+  animation-delay: 0s;
+}
+
+.glow-orb:nth-child(2) {
+  width: 250px;
+  height: 250px;
+  background: #ff6b9d;
+  bottom: -80px;
+  left: -80px;
+  animation-delay: -7s;
+}
+
+.glow-orb:nth-child(3) {
+  width: 200px;
+  height: 200px;
+  background: #b48eff;
+  top: 50%;
+  left: 50%;
+  animation-delay: -14s;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(10px, -10px) scale(1.05); }
+}
+
+/* --- 鼠标光标特效 --- */
+.cursor-trail {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  mix-blend-mode: screen;
+}
+
+/* --- 动态边框扫描线（用于选中卡片） --- */
+.card-glow-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    rgba(var(--accent-rgb), 0.3) 10%,
+    transparent 20%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1px;
+  animation: borderSpin 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes borderSpin {
+  to { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* --- 打字机光标 --- */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: var(--accent);
+  font-weight: 300;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* --- 浮动装饰 --- */
+.anime-float {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  animation: floatBob 6s ease-in-out infinite;
+  font-size: 24px;
+  opacity: 0.15;
+  filter: grayscale(0.3);
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+/* --- 网格扫描线背景 --- */
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.01) 2px,
+    rgba(0, 240, 255, 0.01) 4px
+  );
+  animation: scanMove 8s linear infinite;
+}
+
+@keyframes scanMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* --- 浅色模式下的樱花颜色 --- */
+:root[data-theme="light"] .sakura::before {
+  filter: hue-rotate(var(--hue, 0deg)) brightness(0.85);
+}
+
+/* --- 浅色模式下的头像环 --- */
+:root[data-theme="light"] .avatar-ring {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* --- 浅色模式下的工具卡片 --- */
+:root[data-theme="light"] .tool-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+:root[data-theme="light"] .shortcut-item:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
